@@ -1,1 +1,70 @@
-/*  your css code here. If applicable */
+body {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1, h2 {
+  color: #2c3e50;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 5px;
+}
+
+#product-list {
+  list-style-type: none; /* Remove bullet points */
+  padding: 0;
+}
+
+#product-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #ecf0f1;
+  border-radius: 4px;
+}
+
+.add-to-cart-btn {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #27ae60;
+}
+
+#cart-list {
+  list-style-type: disc; /* Use standard bullet points for the cart */
+  padding-left: 20px;
+  border: 1px solid #bdc3c7;
+  padding: 15px;
+  min-height: 50px; /* Ensure cart area is visible even when empty */
+  background-color: #f9f9f9;
+}
+
+#cart-list li {
+  padding: 5px 0;
+  color: #34495e;
+}
+
+#clear-cart-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#clear-cart-btn:hover {
+  background-color: #c0392b;
+}
