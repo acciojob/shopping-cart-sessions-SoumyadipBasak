@@ -7,10 +7,11 @@ const products = [
   { id: 5, name: "Product 5", price: 50 },
 ];
 
-// DOM elements (using IDs from the HTML structure)
+// DOM elements
 const productList = document.getElementById("product-list");
+// Get the cart list and clear button elements
 const cartList = document.getElementById("cart-list");
-const clearCartBtn = document.getElementById("clear-cart-btn"); // Get the clear button
+const clearCartBtn = document.getElementById("clear-cart-btn");
 
 // Key for sessionStorage
 const CART_STORAGE_KEY = 'shoppingCart';
@@ -28,7 +29,6 @@ function loadCart() {
     return cartData ? JSON.parse(cartData) : [];
   } catch (e) {
     console.error("Error parsing cart data from sessionStorage:", e);
-    // Return empty array on error
     return []; 
   }
 }
@@ -44,69 +44,73 @@ function saveCart(cart) {
 
 // --- DOM Rendering Functions ---
 
-// Render product list (mostly provided in the boilerplate)
+// Render product list (1️⃣ Display Products)
 function renderProducts() {
-  // 1️⃣ Checking Products: Ensure 5 products are displayed with buttons.
   products.forEach((product) => {
     const li = document.createElement("li");
-    // data-id is crucial for identifying which product to add
+    // Ensure price is formatted and the button has the necessary data-id
     li.innerHTML = `${product.name} - $${product.price.toFixed(2)} <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
     productList.appendChild(li);
   });
 }
 
-// Render cart list
+// Render cart list (2️⃣ Add Products to Cart / 5️⃣ Persistence)
 function renderCart() {
-  // Get the current state of the cart from storage
+  // Load the current state of the cart from storage
   const currentCart = loadCart(); 
   
   // Clear the existing cart list
   cartList.innerHTML = ''; 
 
-  // 2️⃣ Add Product to Cart: Display each item as an <li> element.
   currentCart.forEach(item => {
     const listItem = document.createElement('li');
-    // Display name and price for clarity
+    // Display name and price (Example 2)
     listItem.textContent = `${item.name} ($${item.price.toFixed(2)})`; 
     cartList.appendChild(listItem);
   });
+  
+  // Note for 1️⃣ Checking Products: If cart is empty, cartList.innerHTML will be '' (no child elements).
 }
 
 // --- Cart Management Functions ---
 
-// Add item to cart
+// Add item to cart (2️⃣ Add Products to Cart / 3️⃣ Session Storage)
 function addToCart(productId) {
   const productToAdd = products.find(p => p.id === productId);
 
   if (productToAdd) {
     let cart = loadCart();
     
-    // Add the product object (id, name, price)
-    cart.push({ ...productToAdd }); 
+    // Add the product object to the cart array
+    // Note: The cart data in sessionStorage will now include the id, name, and price.
+    cart.push({ id: productToAdd.id, name: productToAdd.name, price: productToAdd.price }); 
     
-    // 3️⃣ Session Storage: Update sessionStorage
+    // Save the updated cart to sessionStorage
     saveCart(cart); 
     
-    // 2️⃣ Add Product to Cart: Update the cart display
+    // Update the cart display
     renderCart(); 
   }
 }
 
-// Clear cart
+// Remove item from cart (Not required, but left for completeness if the student wishes to implement it)
+// function removeFromCart(productId) {}
+
+// Clear cart (4️⃣ Clear Cart)
 function clearCart() {
-  // 4️⃣ Clear Cart: Update sessionStorage to be empty
+  // Update sessionStorage to an empty array
   saveCart([]); 
   
-  // 4️⃣ Clear Cart: Update the cart display
+  // Update the cart display
   renderCart(); 
 }
 
 // --- Event Listeners ---
 
-// Handle clicks on the product list (Event Delegation for "Add to Cart" buttons)
+// Handle clicks on the product list (Event Delegation)
 productList.addEventListener('click', (event) => {
   if (event.target.classList.contains('add-to-cart-btn')) {
-    // Get the product ID from the custom data attribute
+    // Get the product ID from the data-id attribute
     const productId = parseInt(event.target.dataset.id);
     addToCart(productId);
   }
@@ -117,11 +121,7 @@ clearCartBtn.addEventListener('click', clearCart);
 
 // --- Initial Render ---
 
-// Initial render
+// 1️⃣ Display Products
 renderProducts();
-// 5️⃣ Persistence: Load and display the cart contents from sessionStorage on load.
-renderCart(); 
-
-// Note: The boilerplate included a `removeFromCart(productId)` function, 
-// but the requirements did not include removing single items. It has been omitted 
-// to keep the code focused purely on the specified requirements.
+// 5️⃣ Persistence: Load and display the cart contents from sessionStorage on page load.
+renderCart();
