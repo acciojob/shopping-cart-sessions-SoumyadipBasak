@@ -1,72 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Session-Based Shopping Cart</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    h1, h2 {
-      color: #2c3e50;
-      border-bottom: 2px solid #3498db;
-      padding-bottom: 5px;
-    }
-    #product-list {
-      list-style-type: none;
-      padding: 0;
-    }
-    #product-list li {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      margin-bottom: 5px;
-      background-color: #ecf0f1;
-      border-radius: 4px;
-    }
-    .add-to-cart-btn {
-      background-color: #2ecc71;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .add-to-cart-btn:hover {
-      background-color: #27ae60;
-    }
-    #cart-list {
-      list-style-type: disc;
-      padding-left: 20px;
-      border: 1px solid #bdc3c7;
-      padding: 15px;
-      min-height: 50px;
-      background-color: #f9f9f9;
-    }
-    #cart-list li {
-      padding: 5px 0;
-      color: #34495e;
-    }
-    #clear-cart-btn {
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
-      margin-top: 20px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    #clear-cart-btn:hover {
-      background-color: #c0392b;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session-Based Shopping Cart</title>
+<style>
+body { font-family: Arial, sans-serif; max-width:800px; margin:0 auto; padding:20px;}
+h1,h2 {color:#2c3e50; border-bottom:2px solid #3498db; padding-bottom:5px;}
+#product-list {list-style:none; padding:0;}
+#product-list li {display:flex; justify-content:space-between; align-items:center; padding:10px; margin-bottom:5px; background:#ecf0f1; border-radius:4px;}
+.add-to-cart-btn {background:#2ecc71; color:#fff; border:none; padding:8px 12px; border-radius:4px; cursor:pointer;}
+.add-to-cart-btn:hover {background:#27ae60;}
+#cart-list {list-style:disc; padding-left:20px; border:1px solid #bdc3c7; padding:15px; min-height:50px; background:#f9f9f9;}
+#cart-list li {padding:5px 0; color:#34495e;}
+#clear-cart-btn {background:#e74c3c; color:#fff; border:none; padding:10px 15px; border-radius:4px; margin-top:20px; cursor:pointer;}
+#clear-cart-btn:hover {background:#c0392b;}
+</style>
 </head>
 <body>
 
@@ -80,83 +29,78 @@
 <button id="clear-cart-btn">Clear Cart</button>
 
 <script>
-  // --- Product Data ---
-  const products = [
-    { id: 1, name: "Product 1", price: 10 },
-    { id: 2, name: "Product 2", price: 20 },
-    { id: 3, name: "Product 3", price: 30 },
-    { id: 4, name: "Product 4", price: 40 },
-    { id: 5, name: "Product 5", price: 50 },
-  ];
+const products = [
+  {id:1,name:"Product 1",price:10},
+  {id:2,name:"Product 2",price:20},
+  {id:3,name:"Product 3",price:30},
+  {id:4,name:"Product 4",price:40},
+  {id:5,name:"Product 5",price:50}
+];
 
-  const productList = document.getElementById("product-list");
-  const cartList = document.getElementById("cart-list");
-  const clearCartBtn = document.getElementById("clear-cart-btn");
+const productList = document.getElementById("product-list");
+const cartList = document.getElementById("cart-list");
+const clearCartBtn = document.getElementById("clear-cart-btn");
+const CART_KEY = "cart";
 
-  const CART_KEY = "cart";
+// Load cart from sessionStorage
+function loadCart() {
+  const data = sessionStorage.getItem(CART_KEY);
+  return data ? JSON.parse(data) : [];
+}
 
-  // --- Session Storage Functions ---
-  function loadCart() {
-    const cartData = sessionStorage.getItem(CART_KEY);
-    return cartData ? JSON.parse(cartData) : [];
-  }
+// Save cart to sessionStorage
+function saveCart(cart) {
+  sessionStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
 
-  function saveCart(cart) {
-    sessionStorage.setItem(CART_KEY, JSON.stringify(cart));
-  }
-
-  // --- Render Functions ---
-  function renderProducts() {
-    products.forEach(product => {
-      const li = document.createElement("li");
-      li.innerHTML = `
-        ${product.name} - $${product.price.toFixed(2)}
-        <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
-      `;
-      productList.appendChild(li);
-    });
-  }
-
-  function renderCart() {
-    const cart = loadCart();
-    cartList.innerHTML = '';
-    cart.forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = `${item.name} ($${item.price.toFixed(2)})`;
-      cartList.appendChild(li);
-    });
-  }
-
-  // --- Cart Functions ---
-  function addToCart(productId) {
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
-
-    const cart = loadCart();
-    // Allow duplicates for Cypress tests
-    cart.push({ id: product.id, name: product.name, price: product.price });
-    saveCart(cart);
-    renderCart();
-  }
-
-  function clearCart() {
-    saveCart([]);
-    renderCart();
-  }
-
-  // --- Event Listeners ---
-  productList.addEventListener("click", e => {
-    if (e.target.classList.contains("add-to-cart-btn")) {
-      const id = parseInt(e.target.dataset.id);
-      addToCart(id);
-    }
+// Render products
+function renderProducts() {
+  products.forEach(p=>{
+    const li = document.createElement("li");
+    li.innerHTML = `${p.name} - $${p.price} <button class="add-to-cart-btn" data-id="${p.id}">Add to Cart</button>`;
+    productList.appendChild(li);
   });
+}
 
-  clearCartBtn.addEventListener("click", clearCart);
+// Render cart
+function renderCart() {
+  const cart = loadCart();
+  cartList.innerHTML = '';
+  cart.forEach(item=>{
+    const li = document.createElement("li");
+    li.textContent = `${item.name} ($${item.price})`;
+    cartList.appendChild(li);
+  });
+}
 
-  // --- Initial Render ---
-  renderProducts();
+// Add product to cart
+function addToCart(id) {
+  const product = products.find(p=>p.id===id);
+  if(!product) return;
+  const cart = loadCart();
+  cart.push({id:product.id,name:product.name,price:product.price}); // allow duplicates
+  saveCart(cart);
   renderCart();
+}
+
+// Clear cart
+function clearCart() {
+  saveCart([]);
+  renderCart();
+}
+
+// Event listeners
+productList.addEventListener("click",e=>{
+  if(e.target.classList.contains("add-to-cart-btn")){
+    addToCart(parseInt(e.target.dataset.id));
+  }
+});
+
+clearCartBtn.addEventListener("click",clearCart);
+
+// Initial render
+renderProducts();
+renderCart();
 </script>
 
 </body>
