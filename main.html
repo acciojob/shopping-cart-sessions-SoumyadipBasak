@@ -4,7 +4,78 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Session-Based Shopping Cart</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      color: #2c3e50;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 5px;
+    }
+
+    #product-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    #product-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 5px;
+      background-color: #ecf0f1;
+      border-radius: 4px;
+    }
+
+    .add-to-cart-btn {
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .add-to-cart-btn:hover {
+      background-color: #27ae60;
+    }
+
+    #cart-list {
+      list-style-type: disc;
+      padding-left: 20px;
+      border: 1px solid #bdc3c7;
+      padding: 15px;
+      min-height: 50px;
+      background-color: #f9f9f9;
+    }
+
+    #cart-list li {
+      padding: 5px 0;
+      color: #34495e;
+    }
+
+    #clear-cart-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    #clear-cart-btn:hover {
+      background-color: #c0392b;
+    }
+  </style>
 </head>
 <body>
   <h1>Products</h1>
@@ -15,6 +86,76 @@
 
   <button id="clear-cart-btn">Clear Cart</button>
 
-  <script src="script.js"></script>
+  <script>
+    const products = [
+      { id: 1, name: "Product 1", price: 10 },
+      { id: 2, name: "Product 2", price: 20 },
+      { id: 3, name: "Product 3", price: 30 },
+      { id: 4, name: "Product 4", price: 40 },
+      { id: 5, name: "Product 5", price: 50 },
+    ];
+
+    const productList = document.getElementById("product-list");
+    const cartList = document.getElementById("cart-list");
+    const clearCartBtn = document.getElementById("clear-cart-btn");
+    const CART_KEY = "cart";
+
+    function loadCart() {
+      const data = sessionStorage.getItem(CART_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+
+    function saveCart(cart) {
+      sessionStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+
+    function renderProducts() {
+      productList.innerHTML = "";
+      products.forEach(product => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${product.name} - $${product.price}
+          <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+        `;
+        productList.appendChild(li);
+      });
+    }
+
+    function renderCart() {
+      const cart = loadCart();
+      cartList.innerHTML = "";
+      cart.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} ($${item.price})`;
+        cartList.appendChild(li);
+      });
+    }
+
+    function addToCart(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+      const cart = loadCart();
+      cart.push({ id: product.id, name: product.name, price: product.price });
+      saveCart(cart);
+      renderCart();
+    }
+
+    function clearCart() {
+      saveCart([]);
+      renderCart();
+    }
+
+    productList.addEventListener("click", (e) => {
+      if (e.target.classList.contains("add-to-cart-btn")) {
+        addToCart(parseInt(e.target.dataset.id));
+      }
+    });
+
+    clearCartBtn.addEventListener("click", clearCart);
+
+    // Initial render
+    renderProducts();
+    renderCart();
+  </script>
 </body>
 </html>
