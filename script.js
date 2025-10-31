@@ -1,7 +1,3 @@
-// ----------------------------
-//  Shopping Cart Application
-// ----------------------------
-
 // Product data
 const products = [
   { id: 1, name: "Product 1", price: 10 },
@@ -11,79 +7,71 @@ const products = [
   { id: 5, name: "Product 5", price: 50 },
 ];
 
-// DOM elements
+// DOM Elements
 const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// sessionStorage key
 const CART_KEY = "cart";
 
-// --- Load Cart ---
+// --- Session Storage Utilities ---
 function loadCart() {
   const data = sessionStorage.getItem(CART_KEY);
   return data ? JSON.parse(data) : [];
 }
 
-// --- Save Cart ---
 function saveCart(cart) {
   sessionStorage.setItem(CART_KEY, JSON.stringify(cart));
 }
 
-// --- Render Products ---
+// --- Render Functions ---
 function renderProducts() {
   productList.innerHTML = "";
-  products.forEach((p) => {
+  products.forEach(product => {
     const li = document.createElement("li");
     li.innerHTML = `
-      ${p.name} - $${p.price}
-      <button class="add-btn" data-id="${p.id}">Add to Cart</button>
+      ${product.name} - $${product.price}
+      <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
     `;
     productList.appendChild(li);
   });
 }
 
-// --- Render Cart ---
 function renderCart() {
   const cart = loadCart();
   cartList.innerHTML = "";
-  cart.forEach((item) => {
+  cart.forEach(item => {
     const li = document.createElement("li");
     li.textContent = `${item.name} ($${item.price})`;
     cartList.appendChild(li);
   });
 }
 
-// --- Add to Cart ---
+// --- Cart Management ---
 function addToCart(productId) {
-  const product = products.find((p) => p.id === productId);
+  const product = products.find(p => p.id === productId);
   if (!product) return;
-
+  
   const cart = loadCart();
-  cart.push(product);
+  cart.push({ id: product.id, name: product.name, price: product.price });
   saveCart(cart);
   renderCart();
 }
 
-// --- Clear Cart ---
 function clearCart() {
   saveCart([]);
   renderCart();
 }
 
 // --- Event Listeners ---
-if (productList) {
-  productList.addEventListener("click", (e) => {
-    if (e.target.classList.contains("add-btn")) {
-      const id = parseInt(e.target.dataset.id);
-      addToCart(id);
-    }
-  });
-}
+productList.addEventListener("click", (e) => {
+  if (e.target.classList.contains("add-to-cart-btn")) {
+    const id = parseInt(e.target.dataset.id);
+    addToCart(id);
+  }
+});
 
-if (clearCartBtn) {
-  clearCartBtn.addEventListener("click", clearCart);
-}
+clearCartBtn.addEventListener("click", clearCart);
 
 // --- Initial Render ---
 renderProducts();
